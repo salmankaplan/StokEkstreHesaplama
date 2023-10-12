@@ -1,0 +1,88 @@
+﻿@model List<StokRaporuModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Stok Raporu</h1>
+</div>
+
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+</style>
+
+<br />
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+
+            <form asp-controller="Home" asp-action="Index" method="post">
+                <label for="tarih">Başlangıç Tarih:</label>
+                <input type="date" id="baslaTarih" name="baslaTarih">
+
+                <label for="tarih">Bitiş Tarih:</label>
+                <input type="date" id="bitTarih" name="bitTarih">
+
+                @*bilerek combobox yaptım*@
+                <label for="renk">Mal Kodu Seçin:</label>
+                <select id="kod" name="kod">
+                    <option value="" disabled selected style="display:none;">Seçenekleri belirleyin</option>
+                    @foreach (var item in ViewBag.result)
+                    {
+                        <option value=@item>@item</option>
+                    }
+
+                </select>
+                <button type="submit">Rapor Oluştur</button>
+            </form>
+            <br />
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sıra No</th>
+                        <th>İşlem Türü</th>
+                        <th>Evrak No</th>
+                        <th>Tarih</th>
+                        <th>Giriş Miktarı</th>
+                        <th>Çıkış Miktarı</th>
+                        <th>Stok Miktarı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="h5">@item.SiraNo</td>
+                                <td class="h5">@item.IslemTur</td>
+                                <td class="h5">@item.EvrakNo</td>
+                                <td class="h5">@item.Tarih</td>
+                                <td class="h5">@item.GirisMiktar</td>
+                                <td class="h5">@item.CikisMiktar</td>
+                                <td class="h5">@item.StokMiktar</td>
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+ALTER PROCEDURE [dbo].[StokRaporu]
+--dýþarýdan alacaðýmýz deðerler ayarlandý, veritabanýnda tarih int tipinde ayarlanmýþ
+    @Malkodu NVARCHAR(50), 
+    @BaslangicTarihi int,
+    @BitisTarihi int
+AS
+BEGIN
+    SELECT
+	    --sýra no tarihe göre artan þekilde ayarlandý
+        ROW_NUMBER() OVER (ORDER BY Tarih) AS SiraNo, 
+        CASE 
+            WHEN STI.IslemTur = 0 THEN 'Giriþ' --IslemTur 0 ise Giriþ
+            WHEN STI.IslemTur = 1 THEN 'Çýkýþ' --IslemTur 1 ise Çýkýþ
+            ELSE 'Diðer' --Farklý bir deðer gelirse Diðer yazacak þekilde ayarlandý
+        END AS IslemTur,
+        STI.EvrakNo,
+
+		 --tarih alaný DateTime'a dönüþtürüldü, sql 2 gün ileride hesapladýðý için önce -2 yaptým
+        CONVERT(VARCHAR(15), CAST(STI.Tarih-2 AS DATETIME), 23) AS Tarih,
+
+		--IslemTur verisinin deðerine göre giriþ miktarý, çýkýþ miktarý set edildi
+        CASE WHEN STI.IslemTur = 0 THEN Cast(STI.Miktar as int) ELSE 0 END AS GirisMiktar,
+        CASE WHEN STI.IslemTur = 1 THEN Cast(STI.Miktar as int) ELSE 0 END AS CikisMiktar,
+
+		--stok miktarý default olarak null atandý, kodda hesaplanacak
+        null as StokMiktar 
+    FROM
+        STI
+    WHERE
+		--dýþarýdan alýnan deðerlere göre koþulu oluþturduk
+        STI.Malkodu = @Malkodu 
+		AND STI.Tarih >= @BaslangicTarihi
+        AND STI.Tarih <= @BitisTarihi
+END
